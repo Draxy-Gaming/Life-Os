@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware"; 
+import { persist } from "zustand/middleware";
 
 import type {
   UserSettings,
@@ -22,7 +22,6 @@ import type {
 import { loadUserData, saveAllUserData } from "./sync";
 
 interface AppState {
-
   userId: string | null;
   isLoading: boolean;
   isSynced: boolean;
@@ -86,15 +85,14 @@ interface AppState {
   getDailyScore: () => DailyScore;
 }
 
-const DEFAULT_EXERCISES: Exercise[] = [  ];
-const DEFAULT_HABITS: Habit[] = [  ];
-const DEFAULT_TASBIH: TasbihEntry[] = [  ];
-const DEFAULT_USER_SETTINGS: UserSettings = {  };
+const DEFAULT_EXERCISES: Exercise[] = [];
+const DEFAULT_HABITS: Habit[] = [];
+const DEFAULT_TASBIH: TasbihEntry[] = [];
+const DEFAULT_USER_SETTINGS = {} as UserSettings;
 
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-
       userId: null,
       isLoading: false,
       isSynced: false,
@@ -103,13 +101,17 @@ export const useAppStore = create<AppState>()(
       loadData: async (userId) => {
         set({ isLoading: true });
         try {
-
           const data = await loadUserData(userId);
 
-          const cachedOnboarded = typeof window !== 'undefined' && localStorage.getItem(`lifeos_onboarded_${userId}`);
-          const isOnboarded = !!cachedOnboarded || !!(data.userSettings.name && data.userSettings.mainGoal);
+          const cachedOnboarded = typeof window !== "undefined" && localStorage.getItem(`lifeos_onboarded_${userId}`);
+          const isOnboarded = !!cachedOnboarded || !!(data.userSettings?.name && data.userSettings?.mainGoal);
 
           const today = new Date().toDateString();
+          
+          if (!data.dailyPrayers) {
+            data.dailyPrayers = {};
+          }
+          
           if (!data.dailyPrayers[today]) {
             data.dailyPrayers[today] = {
               date: today, fajr: false, fajrMasjid: false, dhuhr: false, dhuhrMasjid: false,
@@ -138,7 +140,7 @@ export const useAppStore = create<AppState>()(
             normalizedDailyHabits[todayKey] = { date: new Date().toISOString().split("T")[0], completions: {} };
           }
 
-          const habitsWithCompletion = data.habits.map((h) => {
+          const habitsWithCompletion = (data.habits || []).map((h) => {
             const wasCompleted = !!(normalizedDailyHabits[todayKey] && normalizedDailyHabits[todayKey].completions[h.id]);
             return { ...h, completedToday: wasCompleted, lastCompletedAt: wasCompleted ? todayKey : h.lastCompletedAt };
           });
@@ -146,18 +148,18 @@ export const useAppStore = create<AppState>()(
           set({
             userId,
             userSettings: data.userSettings,
-            tasks: data.tasks,
+            tasks: data.tasks || [],
             habits: habitsWithCompletion,
-            sleepEntries: data.sleepEntries,
+            sleepEntries: data.sleepEntries || [],
             dailyPrayers: data.dailyPrayers,
             dailyHabits: normalizedDailyHabits,
-            tasbihEntries: data.tasbihEntries,
-            quranLogs: data.quranLogs,
-            exams: data.exams,
-            studySessions: data.studySessions,
-            exercises: data.exercises,
-            workoutLogs: data.workoutLogs,
-            workoutSchedule: data.workoutSchedule,
+            tasbihEntries: data.tasbihEntries || [],
+            quranLogs: data.quranLogs || [],
+            exams: data.exams || [],
+            studySessions: data.studySessions || [],
+            exercises: data.exercises || [],
+            workoutLogs: data.workoutLogs || [],
+            workoutSchedule: data.workoutSchedule || [],
             isLoading: false,
             isSynced: true,
             isOnboarded,
@@ -219,7 +221,7 @@ export const useAppStore = create<AppState>()(
       quranLogs: [],
       addQuranLog: (log) => {  },
 
-      exams: [  ],
+      exams: [],
       addExam: (exam) => {  },
       updateExam: (id, updates) => {  },
       deleteExam: (id) => {  },
@@ -240,15 +242,13 @@ export const useAppStore = create<AppState>()(
       workoutSchedule: [],
       setWorkoutSchedule: (schedule) => {  },
 
-      getDailyScore: () => {  },
+      getDailyScore: () => ({} as DailyScore),
     }),
     {
-      name: "storage", 
-
+      name: "storage",
       partialize: (state) => ({
         ...state,
-        isLoading: false, 
-
+        isLoading: false,
       }),
     }
   )
