@@ -5,6 +5,7 @@
 <div align="center">
 
 <!-- Badges - Technologies & Tools -->
+[![Netlify Status](https://api.netlify.com/api/v1/badges/07fe994f-021d-45f1-bd2e-f2179afe9834/deploy-status)](https://app.netlify.com/projects/lifeosbd/deploys)
 ![Next.js](https://img.shields.io/badge/Next.js_16-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript_5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
